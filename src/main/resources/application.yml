@@ -10,6 +10,11 @@ spring:
       chat:
         options:
           model: qwen3-max
+  datasource:
+    url: jdbc:mysql://localhost:3306/ai_agent_db?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
 server:
   port: 8123
   servlet:
@@ -26,6 +31,14 @@ springdoc:
     - group: 'default'
       paths-to-match: '/**'
       packages-to-scan: com.zhishi.aiagent.controller
+
+mybatis:
+  #mapper配置文件
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.zhishi.aiagent.dto
+  configuration:
+    #开启驼峰命名
+    map-underscore-to-camel-case: true
 
 knife4j:
   enable: true
