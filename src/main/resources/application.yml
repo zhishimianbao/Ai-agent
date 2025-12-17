@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: Ai-agent
+  profiles:
+    active: local
+  ai:
+    dashscope:
+#     自行设置APIkey
+      api-key: ${spring.ai.api-key}
+      chat:
+        options:
+          model: qwen3-max
+server:
+  port: 8123
+  servlet:
+    context-path: /api
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan: com.zhishi.aiagent.controller
+
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
