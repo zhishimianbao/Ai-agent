@@ -14,7 +14,7 @@ public class TripMindController {
         this.tripMind = tripMind;
     }
 
-    @GetMapping("/plan")
+    @GetMapping("/tripmind/plan")
     public String TravelPlan(
             @RequestParam String chatId,
             @RequestParam String destination,
@@ -25,8 +25,5 @@ public class TripMindController {
         return tripMind.generateTravelPlan(chatId, destination, travelDates, interests, budget);
     }
 
-    @GetMapping("/test")
-    public String test() {
-        return tripMind.doChat("123");
-    }
+
 }

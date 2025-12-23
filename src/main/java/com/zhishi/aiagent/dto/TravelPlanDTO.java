@@ -1,5 +1,6 @@
 package com.zhishi.aiagent.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -17,5 +18,7 @@ public class TravelPlanDTO {
     private Integer outputTokens;
     private Integer totalTokens;
 //    private Double costEstimate;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdTime;
 }

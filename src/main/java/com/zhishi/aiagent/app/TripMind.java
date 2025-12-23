@@ -1,6 +1,6 @@
 package com.zhishi.aiagent.app;
 
-import com.zhishi.aiagent.advisor.MyLoggerAdvisor;
+import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.zhishi.aiagent.dto.TravelPlanDTO;
 import com.zhishi.aiagent.mapper.TravelPlanMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -12,11 +12,8 @@ import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.PromptTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -26,9 +23,10 @@ import java.util.Map;
 public class TripMind {
 
     private final ChatClient chatClient;
+
     private final PromptTemplate promptTemplate;
 
-    private TravelPlanMapper travelPlanMapper; // MyBatis Mapper
+    private final TravelPlanMapper travelPlanMapper; // MyBatis Mapper
 
     // 新增 ResourceLoader 用于加载模板文件
     public TripMind(ChatModel dashscopeChatModel, ResourceLoader resourceLoader, TravelPlanMapper travelPlanMapper) {
@@ -54,46 +52,6 @@ public class TripMind {
     }
 
     /**
-     * AI 基础对话（支持多轮对话记忆）
-     *
-     * @param chatId
-     * @return
-     */
-    public String doChat(String chatId) {
-        ChatResponse chatResponse = chatClient
-                .prompt()
-                .user("你好，你是谁")
-                .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
-                .call()
-                .chatResponse();
-        String content = chatResponse.getResult().getOutput().getText();
-        log.info("content: {}", content);
-        // 提取元数据
-        var usage = chatResponse.getMetadata().getUsage();
-        Integer inputTokens = usage.getPromptTokens();
-        Integer outputTokens = usage.getCompletionTokens();
-        String modelName = chatResponse.getMetadata().getModel();
-
-        log.info("Tokens used - input: {}, output: {}", inputTokens, outputTokens);
-
-        // 构建 DTO
-        TravelPlanDTO dto = new TravelPlanDTO();
-        dto.setChatId(chatId);
-        dto.setModelName(modelName);
-        dto.setInputTokens(inputTokens);
-        dto.setOutputTokens(outputTokens);
-        dto.setTotalTokens(inputTokens + outputTokens);
-        // 示例：qwen3-max 约 ¥0.00012 / token（按实际模型定价调整）
-//        dto.setCostEstimate((dto.getTotalTokens() * 0.00012));
-        dto.setCreatedTime(LocalDateTime.now());
-
-        // 持久化到 MySQL
-        travelPlanMapper.insertCost(dto);
-
-        return content;
-    }
-
-    /**
      * 生成个性化旅行攻略（单次任务，不依赖多轮对话）
      *
      * @param destination   目的地（如“日本京都”）
@@ -116,6 +74,8 @@ public class TripMind {
         ChatResponse chatResponse = chatClient
                 .prompt()
                 .user(renderedPrompt)
+                //开启联网搜索
+                .options(DashScopeChatOptions.builder().withEnableSearch(true).build())
                 .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
                 .call()
                 .chatResponse();
@@ -147,4 +107,7 @@ public class TripMind {
 
         return content;
     }
+
+// TODO 地图API Tool 报告生成
+
 }

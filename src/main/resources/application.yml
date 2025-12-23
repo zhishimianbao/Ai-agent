@@ -1,15 +1,14 @@
 spring:
   application:
-    name: Ai-agent
+    name: mianbao-agent
   profiles:
     active: local
   ai:
     dashscope:
-#     自行设置APIkey
-      api-key: ${spring.ai.api-key}
+      api-key: ${ai.api-key}
       chat:
         options:
-          model: qwen3-max
+          model: qwen-flash
   datasource:
     url: jdbc:mysql://localhost:3306/ai_agent_db?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: root
@@ -33,11 +32,10 @@ springdoc:
       packages-to-scan: com.zhishi.aiagent.controller
 
 mybatis:
-  #mapper配置文件
+
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.zhishi.aiagent.dto
   configuration:
-    #开启驼峰命名
     map-underscore-to-camel-case: true
 
 knife4j:
