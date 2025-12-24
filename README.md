@@ -1,5 +1,4 @@
 # TripMind 旅行规划助手
-* 
 一个基于 Spring Boot 和 Spring AI 开发的智能旅行规划助手，集成高德地图 API 提供地理信息服务。
 
 ## 功能特性
