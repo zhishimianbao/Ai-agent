@@ -48,6 +48,5 @@ knife4j:
   setting:
     language: zh_cn
 
-# 高德地图API配置
 map:
   api-key: ${amap.api-key}

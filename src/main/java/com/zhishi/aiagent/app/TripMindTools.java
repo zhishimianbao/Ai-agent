@@ -81,7 +81,7 @@ public class TripMindTools {
                 //开启联网搜索
                 .options(DashScopeChatOptions.builder().withEnableSearch(true).build())
                 .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
-                .advisors(new MyLoggerAdvisor())
+//                .advisors(new MyLoggerAdvisor())
                 .toolCallbacks(allTools)
                 .call()
                 .chatResponse();

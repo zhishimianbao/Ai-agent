@@ -1,5 +1,5 @@
-# AI Agent 旅行规划助手
-
+# TripMind 旅行规划助手
+* 
 一个基于 Spring Boot 和 Spring AI 开发的智能旅行规划助手，集成高德地图 API 提供地理信息服务。
 
 ## 功能特性
@@ -8,12 +8,16 @@
 - **智能旅行规划**：根据用户需求生成个性化旅行方案
 - **地理信息服务**：集成高德地图 API 提供丰富的地理数据
 - **工具扩展机制**：支持多种工具的集成和扩展
+- **Token 计数统计**：精确统计 AI 模型调用的输入/输出 token 数量
+- **HTML 旅行计划生成**：将旅行规划转换为精美的 HTML 页面并自动保存
+
 
 ### 集成工具
-- **文件操作工具**：提供文件读写操作能力
+- **文件操作工具**：提供文件读写操作能力，支持自动保存 HTML 旅行计划
 - **PDF 生成工具**：支持生成旅行规划 PDF 文档
 - **网页抓取工具**：获取互联网上的旅行相关信息
 - **终端操作工具**：执行系统命令
+- **HTML 生成工具**：将旅行规划转换为可视化的 HTML 页面
 - **高德地图 API 工具**：
   - 地理编码：将地址转换为经纬度坐标
   - 逆地理编码：将经纬度转换为地址信息
@@ -25,7 +29,7 @@
 
 - **后端框架**：Spring Boot 3.4.12
 - **编程语言**：Java 21
-- **AI 框架**：Spring AI 1.0.0
+- **AI 框架**：Spring AI 1.0.0-M6
 - **大模型**：阿里巴巴达摩院 DashScope
 - **地理服务**：高德地图 API
 - **工具库**：
@@ -85,7 +89,41 @@
 
 ## 使用示例
 
-### 1. 地理编码
+### 1. 智能旅行规划
+
+```java
+TripMindMCP tripMindMCP = new TripMindMCP(dashscopeChatModel, resourceLoader);
+String travelPlan = tripMindMCP.generateTravelPlanWithMCP(
+    "chat123",          // 对话ID
+    "北京",             // 目的地
+    "2026-01-01至2026-01-05", // 出行时间
+    "历史文化,美食",    // 兴趣偏好
+    "5000-8000元"       // 预算
+);
+```
+
+### 2. 生成HTML旅行计划
+
+```java
+String travelPlan = "# 北京三日游\n## 第一天\n- 上午：参观故宫博物院...";
+String htmlContent = tripMindMCP.generateTravelHtml(travelPlan, "北京");
+```
+
+### 3. 一体化旅行计划生成（带HTML）
+
+```java
+Map<String, String> result = tripMindMCP.generateTravelPlanWithHtml(
+    "chat123",          // 对话ID
+    "北京",             // 目的地
+    "2026-01-01至2026-01-05", // 出行时间
+    "历史文化,美食",    // 兴趣偏好
+    "5000-8000元"       // 预算
+);
+String travelPlan = result.get("travelPlan");
+String htmlContent = result.get("htmlContent");
+```
+
+### 4. 地理编码
 将地址转换为经纬度坐标：
 
 ```java
@@ -94,7 +132,7 @@ String result = amapTool.geocode("南京市", null);
 System.out.println(result);
 ```
 
-### 2. 兴趣点搜索
+### 5. 兴趣点搜索
 搜索镇江的美食地点：
 
 ```java
@@ -102,7 +140,7 @@ String foodPlaces = amapTool.placeSearch("美食", "镇江市", "100000", 10);
 System.out.println(foodPlaces);
 ```
 
-### 3. 路径规划
+### 6. 路径规划
 计算南京到镇江的驾车路线：
 
 ```java
@@ -114,12 +152,12 @@ String drivingRoute = amapTool.drivingDirection(
 System.out.println(drivingRoute);
 ```
 
-### 4. 步行路径规划
+### 7. 步行路径规划
 计算镇江市区内的步行路线：
 
 ```java
 String walkingRoute = amapTool.walkingDirection(
-    "119.443818,32.206882",  // 镇江火车站经纬度
+    "119.443818,32.060255",  // 镇江火车站经纬度
     "119.449011,32.204094"   // 镇江美食点经纬度
 );
 System.out.println(walkingRoute);
@@ -131,6 +169,11 @@ System.out.println(walkingRoute);
 src/
 ├── main/
 │   ├── java/com/zhishi/aiagent/
+│   │   ├── advisor/           # 聊天客户端增强器
+│   │   ├── app/               # 应用服务类
+│   │   │   ├── TripMindMCP.java      # 旅行规划主服务（带Token计数和HTML生成）
+│   │   │   ├── TripMindTools.java    # 带工具调用的旅行规划服务
+│   │   │   └── ...
 │   │   ├── controller/        # 控制器层
 │   │   ├── dto/               # 数据传输对象
 │   │   ├── mapper/            # MyBatis 映射器
@@ -139,10 +182,15 @@ src/
 │   │   │   ├── AmapAPITool.java      # 高德地图 API 工具
 │   │   │   ├── FileOperationTool.java # 文件操作工具
 │   │   │   ├── PDFGenerationTool.java # PDF 生成工具
+│   │   │   ├── ToolRegistration.java  # 工具注册配置
 │   │   │   └── ...
 │   │   └── Application.java   # 应用主类
 │   └── resources/
 │       ├── mapper/            # MyBatis 映射文件
+│       ├── templates/         # 提示词模板
+│       │   ├── TripMindSimplePrompt.st  # 旅行规划提示词
+│       │   ├── TravelHtmlPrompt.st     # HTML生成提示词
+│       │   └── ...
 │       ├── application.yml    # 应用配置
 │       └── mcp-servers.json   # MCP 服务器配置
 └── test/                      # 测试代码
@@ -172,6 +220,13 @@ http://localhost:8123/api/swagger-ui.html
 - 问题反馈：https://github.com/your-username/ai-agent/issues
 
 ## 更新日志
+
+### v0.0.2-SNAPSHOT (2025-12-25)
+- 新增 TripMindMCP 服务类，实现智能旅行规划核心功能
+- 集成 Token 计数统计功能，精确跟踪模型调用的 token 使用量
+- 新增 HTML 旅行计划生成功能，支持将旅行规划转换为精美的 HTML 页面
+- 优化工具调用机制，统一使用 ToolCallback[] allTools 注入模式
+- 实现自动文件保存功能，支持将生成的 HTML 旅行计划保存到本地
 
 ### v0.0.1-SNAPSHOT (2025-12-24)
 - 初始版本发布
