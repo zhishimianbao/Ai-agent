@@ -8,7 +8,12 @@ spring:
       api-key: ${ai.api-key}
       chat:
         options:
-          model: qwen-flash
+          model: qwen3-max-2025-09-23
+    mcp:
+      client:
+        stdio:
+          servers-configuration: classpath:mcp-servers.json
+
   datasource:
     url: jdbc:mysql://localhost:3306/ai_agent_db?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: root
@@ -42,3 +47,7 @@ knife4j:
   enable: true
   setting:
     language: zh_cn
+
+# 高德地图API配置
+map:
+  api-key: ${amap.api-key}

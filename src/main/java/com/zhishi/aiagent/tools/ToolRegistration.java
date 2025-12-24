@@ -14,6 +14,9 @@ public class ToolRegistration {
 
 //    @Value("${search-api.api-key}")
     private String searchApiKey;
+    
+    @Value("${amap.api-key}")
+    private String amapApiKey;
 
     @Bean
     public ToolCallback[] allTools() {
@@ -24,6 +27,7 @@ public class ToolRegistration {
         TerminalOperationTool terminalOperationTool = new TerminalOperationTool();
         PDFGenerationTool pdfGenerationTool = new PDFGenerationTool();
         TerminateTool terminateTool = new TerminateTool();
+        AmapAPITool amapAPITool = new AmapAPITool(amapApiKey);
         return ToolCallbacks.from(
                 fileOperationTool,
 //                webSearchTool,
@@ -31,7 +35,8 @@ public class ToolRegistration {
                 resourceDownloadTool,
                 terminalOperationTool,
                 pdfGenerationTool,
-                terminateTool
+                terminateTool,
+                amapAPITool
         );
     }
 }
