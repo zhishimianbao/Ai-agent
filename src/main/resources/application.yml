@@ -50,3 +50,5 @@ knife4j:
 
 map:
   api-key: ${amap.api-key}
+  js-key: ${amap.js-key}
+  security-js-code: ${amap.security-js-code}

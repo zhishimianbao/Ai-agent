@@ -20,8 +20,11 @@ public class TripMindController {
             @RequestParam String destination,
             @RequestParam String travelDates,
             @RequestParam String interests,
-            @RequestParam String budget) {
+            @RequestParam String budget,
+            @RequestParam(required = false, defaultValue = "") String time) {
 
+        // time参数用于HTML生成时的文件名，如果为空则使用当前时间戳
+        // 这里只是接收参数，实际使用在HTML生成时
         return tripMind.generateTravelPlan(chatId, destination, travelDates, interests, budget);
     }
 

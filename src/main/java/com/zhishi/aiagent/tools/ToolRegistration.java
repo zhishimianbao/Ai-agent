@@ -18,6 +18,12 @@ public class ToolRegistration {
     @Value("${amap.api-key}")
     private String amapApiKey;
 
+    @Value("${map.js-key:}")
+    private String jsApiKey;
+
+    @Value("${map.security-js-code:}")
+    private String securityJsCode;
+
     @Bean
     public ToolCallback[] allTools() {
         FileOperationTool fileOperationTool = new FileOperationTool();
@@ -27,7 +33,7 @@ public class ToolRegistration {
         TerminalOperationTool terminalOperationTool = new TerminalOperationTool();
         PDFGenerationTool pdfGenerationTool = new PDFGenerationTool();
         TerminateTool terminateTool = new TerminateTool();
-        AmapAPITool amapAPITool = new AmapAPITool(amapApiKey);
+        AmapAPITool amapAPITool = new AmapAPITool(amapApiKey, jsApiKey, securityJsCode);
         return ToolCallbacks.from(
                 fileOperationTool,
 //                webSearchTool,
