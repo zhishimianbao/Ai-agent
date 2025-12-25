@@ -121,46 +121,9 @@ Map<String, String> result = tripMindMCP.generateTravelPlanWithHtml(
 String travelPlan = result.get("travelPlan");
 String htmlContent = result.get("htmlContent");
 ```
+## 效果如图
 
-### 4. 地理编码
-将地址转换为经纬度坐标：
-
-```java
-AmapAPITool amapTool = new AmapAPITool("your-amap-api-key");
-String result = amapTool.geocode("南京市", null);
-System.out.println(result);
-```
-
-### 5. 兴趣点搜索
-搜索镇江的美食地点：
-
-```java
-String foodPlaces = amapTool.placeSearch("美食", "镇江市", "100000", 10);
-System.out.println(foodPlaces);
-```
-
-### 6. 路径规划
-计算南京到镇江的驾车路线：
-
-```java
-String drivingRoute = amapTool.drivingDirection(
-    "118.796877,32.060255",  // 南京经纬度
-    "119.449011,32.204094",  // 镇江经纬度
-    null
-);
-System.out.println(drivingRoute);
-```
-
-### 7. 步行路径规划
-计算镇江市区内的步行路线：
-
-```java
-String walkingRoute = amapTool.walkingDirection(
-    "119.443818,32.060255",  // 镇江火车站经纬度
-    "119.449011,32.204094"   // 镇江美食点经纬度
-);
-System.out.println(walkingRoute);
-```
+![img.png](tmp/file/img.png)
 
 ## 项目结构
 
