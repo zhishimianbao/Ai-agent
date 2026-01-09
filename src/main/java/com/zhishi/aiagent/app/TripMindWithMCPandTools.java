@@ -17,7 +17,11 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 //@Transactional
 @Component
@@ -234,6 +238,81 @@ public class TripMindWithMCPandTools {
         this.totalPromptTokens += promptTokens;
         this.totalCompletionTokens += completionTokens;
     }
+
+    /**
+     * 生成个性化旅行攻略（返回Flux流）
+     *
+     * @param chatId       对话ID
+     * @param destination  目的地（如“日本京都”）
+     * @param travelDates  出行时间（如“2025年10月1日-10月5日”）
+     * @param interests    兴趣偏好（如“历史文化、美食、摄影”）
+     * @param budget       预算
+     * @return Flux流，包含生成的旅游攻略内容
+     */
+    public Flux<String> generateTravelPlanWithMCPFlux(String chatId, String destination, String travelDates, String interests, String budget) {
+        // 渲染模板
+        String renderedPrompt = promptTemplate.render(Map.of(
+                "destination", destination,
+                "travelDates", travelDates,
+                "interests", interests,
+                "budget", budget
+        ));
+
+        log.info("Rendered prompt: {}", renderedPrompt);
+
+        // 调用模型的流式接口
+        return chatClient
+                .prompt()
+                .user(renderedPrompt)
+                .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
+                .advisors(new MyLoggerAdvisor())
+//                .toolCallbacks(allTools)
+                .stream()
+                .content();
+    }
+
+    /**
+     * 生成个性化旅行攻略（SSE流式输出）
+     *
+     * @param chatId       对话ID
+     * @param destination  目的地（如“日本京都”）
+     * @param travelDates  出行时间（如“2025年10月1日-10月5日”）
+     * @param interests    兴趣偏好（如“历史文化、美食、摄影”）
+     * @param budget       预算
+     * @return SseEmitter，用于向客户端发送SSE事件
+     */
+    public SseEmitter generateTravelPlanWithMCPStreamSSE(String chatId, String destination, String travelDates, String interests, String budget) {
+        // 创建SSE发射器，设置超时时间为3分钟
+        SseEmitter emitter = new SseEmitter(180000L);
+
+        try {
+            // 获取Flux流并订阅，将内容通过SSE发送给客户端
+            generateTravelPlanWithMCPFlux(chatId, destination, travelDates, interests, budget)
+                    .doOnNext(chunk -> {
+                        try {
+                            emitter.send(chunk);
+                        } catch (Exception e) {
+                            log.error("Error sending SSE event: {}", e.getMessage());
+                            emitter.completeWithError(e);
+                        }
+                    })
+                    .doOnComplete(() -> {
+                        log.info("SSE stream completed");
+                        emitter.complete();
+                    })
+                    .doOnError(error -> {
+                        log.error("Error generating travel plan for SSE: {}", error.getMessage());
+                        emitter.completeWithError(error);
+                    })
+                    .subscribe();
+        } catch (Exception e) {
+            log.error("Error initializing SSE stream: {}", e.getMessage());
+            emitter.completeWithError(e);
+        }
+
+        return emitter;
+    }
+
 
     // TODO 加入相关图片 小红书链接（图片+内容）
 
