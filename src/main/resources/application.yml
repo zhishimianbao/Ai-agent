@@ -11,6 +11,8 @@ spring:
           model: qwen3-max-2025-09-23
     mcp:
       client:
+#        enabled: false  # 直接禁用，部署需禁用，网络问题
+#        实际部署（linux环境）要去掉npx.cmd的.cmd
         stdio:
           servers-configuration: classpath:mcp-servers.json
 

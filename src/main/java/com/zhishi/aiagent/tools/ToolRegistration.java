@@ -15,13 +15,13 @@ public class ToolRegistration {
 //    @Value("${search-api.api-key}")
     private String searchApiKey;
     
-    @Value("${amap.api-key}")
+    @Value("${map.api-key}")
     private String amapApiKey;
 
-    @Value("${map.js-key:}")
+    @Value("${map.js-key}")
     private String jsApiKey;
 
-    @Value("${map.security-js-code:}")
+    @Value("${map.security-js-code}")
     private String securityJsCode;
 
     @Bean

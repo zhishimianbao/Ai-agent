@@ -29,7 +29,7 @@
 - **后端框架**：Spring Boot 3.4.12
 - **编程语言**：Java 21
 - **AI 框架**：Spring AI 1.0.0-M6
-- **大模型**：阿里巴巴达摩院 DashScope
+- **大模型**：阿里巴巴 DashScope
 - **地理服务**：高德地图 API
 - **工具库**：
   - Hutool：Java 工具集
@@ -51,7 +51,7 @@
 
 1. **克隆仓库**
    ```bash
-   git clone https://github.com/your-username/ai-agent.git
+   git clone git@github.com:zhishimianbao/ai-agent.git
    cd ai-agent
    ```
 
@@ -70,7 +70,7 @@
    spring:
      ai:
        dashscope:
-         api-key: ${ai.api-key}  # 阿里巴巴达摩院 API 密钥
+         api-key: ${ai.api-key}  # 阿里巴巴 API 密钥
    
    # 高德地图 API 配置
    amap:
@@ -82,10 +82,6 @@
    mvn spring-boot:run
    ```
 
-6. **访问应用**
-   - API 文档：http://localhost:8123/api/swagger-ui.html
-   - 应用接口：http://localhost:8123/api
-
 ## 使用示例
 
 ### 1. 智能旅行规划
@@ -94,10 +90,10 @@
 TripMindMCP tripMindMCP = new TripMindMCP(dashscopeChatModel, resourceLoader);
 String travelPlan = tripMindMCP.generateTravelPlanWithMCP(
     "chat123",          // 对话ID
-    "北京",             // 目的地
-    "2026-01-01至2026-01-05", // 出行时间
-    "历史文化,美食",    // 兴趣偏好
-    "5000-8000元"       // 预算
+    "常州",             // 目的地
+    "2025-12-26至2025-12-27", // 出行时间
+    "景点,美食",    // 兴趣偏好
+    "200-500元"       // 预算
 );
 ```
 
@@ -113,10 +109,10 @@ String htmlContent = tripMindMCP.generateTravelHtml(travelPlan, "北京");
 ```java
 Map<String, String> result = tripMindMCP.generateTravelPlanWithHtml(
     "chat123",          // 对话ID
-    "北京",             // 目的地
-    "2026-01-01至2026-01-05", // 出行时间
-    "历史文化,美食",    // 兴趣偏好
-    "5000-8000元"       // 预算
+    "常州",             // 目的地
+    "2025-12-26至2025-12-27", // 出行时间
+    "景点,美食",    // 兴趣偏好
+    "200-500元"       // 预算
 );
 String travelPlan = result.get("travelPlan");
 String htmlContent = result.get("htmlContent");
@@ -162,35 +158,8 @@ src/
 
 项目使用 Knife4j 生成 OpenAPI 3 标准的 API 文档，可通过以下地址访问：
 
-http://localhost:8123/api/swagger-ui.html
-
-## 贡献指南
-
-1. Fork 本仓库
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 打开 Pull Request
+http://localhost:8123/api/doc.html#/home
 
 ## 许可证
 
 本项目采用 Apache License 2.0 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
-
-## 联系方式
-
-- 项目地址：https://github.com/your-username/ai-agent
-- 问题反馈：https://github.com/your-username/ai-agent/issues
-
-## 更新日志
-
-### v0.0.2-SNAPSHOT (2025-12-25)
-- 新增 TripMindMCP 服务类，实现智能旅行规划核心功能
-- 集成 Token 计数统计功能，精确跟踪模型调用的 token 使用量
-- 新增 HTML 旅行计划生成功能，支持将旅行规划转换为精美的 HTML 页面
-- 优化工具调用机制，统一使用 ToolCallback[] allTools 注入模式
-- 实现自动文件保存功能，支持将生成的 HTML 旅行计划保存到本地
-
-### v0.0.1-SNAPSHOT (2025-12-24)
-- 初始版本发布
-- 集成基础工具集
-- 新增高德地图 API 工具，支持地理编码、路径规划、兴趣点搜索等功能
