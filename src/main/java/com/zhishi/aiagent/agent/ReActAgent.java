@@ -1,5 +1,7 @@
 package com.zhishi.aiagent.agent;
 
+import cn.hutool.core.util.StrUtil;
+import com.zhishi.aiagent.agent.model.AgentState;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +14,19 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 @Slf4j
 public abstract class ReActAgent extends BaseAgent {
+
+    /**
+     * 模型不再调用工具时生成的最终答案。
+     */
+    private String finalAnswer;
+
+    /**
+     * 保存模型最终答案并结束当前推理循环。
+     */
+    protected void finishWithAnswer(String answer) {
+        setFinalAnswer(answer);
+        setState(AgentState.FINISHED);
+    }
 
     /**
      * 处理当前状态并决定下一步行动
@@ -38,7 +53,8 @@ public abstract class ReActAgent extends BaseAgent {
             // 先思考
             boolean shouldAct = think();
             if (!shouldAct) {
-                return "思考完成 - 无需行动";
+                // 不需要工具时，直接把模型生成的文本作为最终答案返回
+                return StrUtil.blankToDefault(finalAnswer, "思考完成 - 无需行动");
             }
             // 再行动
             return act();

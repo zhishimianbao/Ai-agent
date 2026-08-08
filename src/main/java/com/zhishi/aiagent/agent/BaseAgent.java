@@ -65,7 +65,7 @@ public abstract class BaseAgent {
         List<String> results = new ArrayList<>();
         try {
             // 执行循环
-            for (int i = 0; i < maxSteps && state != AgentState.FINISHED; i++) {
+            for (int i = 0; i < maxSteps && state == AgentState.RUNNING; i++) {
                 int stepNumber = i + 1;
                 currentStep = stepNumber;
                 log.info("Executing step {}/{}", stepNumber, maxSteps);
@@ -75,7 +75,7 @@ public abstract class BaseAgent {
                 results.add(result);
             }
             // 检查是否超出步骤限制
-            if (currentStep >= maxSteps) {
+            if (state == AgentState.RUNNING && currentStep >= maxSteps) {
                 state = AgentState.FINISHED;
                 results.add("Terminated: Reached max steps (" + maxSteps + ")");
             }
@@ -124,7 +124,7 @@ public abstract class BaseAgent {
             List<String> results = new ArrayList<>();
             try {
                 // 执行循环
-                for (int i = 0; i < maxSteps && state != AgentState.FINISHED; i++) {
+                for (int i = 0; i < maxSteps && state == AgentState.RUNNING; i++) {
                     int stepNumber = i + 1;
                     currentStep = stepNumber;
                     log.info("Executing step {}/{}", stepNumber, maxSteps);
@@ -136,7 +136,7 @@ public abstract class BaseAgent {
                     sseEmitter.send(result);
                 }
                 // 检查是否超出步骤限制
-                if (currentStep >= maxSteps) {
+                if (state == AgentState.RUNNING && currentStep >= maxSteps) {
                     state = AgentState.FINISHED;
                     results.add("Terminated: Reached max steps (" + maxSteps + ")");
                     sseEmitter.send("执行结束：达到最大步骤（" + maxSteps + "）");

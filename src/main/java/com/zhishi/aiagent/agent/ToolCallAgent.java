@@ -93,8 +93,9 @@ public class ToolCallAgent extends ReActAgent {
             log.info(toolCallInfo);
             // 如果不需要调用工具，返回 false
             if (toolCallList.isEmpty()) {
-                // 只有不调用工具时，才需要手动记录助手消息
+                // 模型已经生成最终答案：记录消息、结束循环并把答案交给 step() 返回
                 getMessageList().add(assistantMessage);
+                finishWithAnswer(result);
                 return false;
             } else {
                 // 需要调用工具时，无需记录助手消息，因为调用工具时会自动记录
@@ -102,7 +103,10 @@ public class ToolCallAgent extends ReActAgent {
             }
         } catch (Exception e) {
             log.error(getName() + "的思考过程遇到了问题：" + e.getMessage());
-            getMessageList().add(new AssistantMessage("处理时遇到了错误：" + e.getMessage()));
+            String errorMessage = "处理时遇到了错误：" + e.getMessage();
+            getMessageList().add(new AssistantMessage(errorMessage));
+            setFinalAnswer(errorMessage);
+            setState(AgentState.ERROR);
             return false;
         }
     }
